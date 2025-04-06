@@ -1,4 +1,6 @@
-import { Hono } from "hono";
+import { WorkersKVStore } from "@hono-rate-limiter/cloudflare";
+import { Hono, Next } from "hono";
+import { rateLimiter } from "hono-rate-limiter";
 import { cache } from "hono/cache";
 import { cors } from "hono/cors";
 import { prettyJSON } from "hono/pretty-json";
@@ -16,6 +18,19 @@ api.use(
     origin: "*",
     allowMethods: ["GET"],
   }),
+);
+
+// enable rate limiting for all routes
+api.use((c, next: Next) =>
+  rateLimiter<{ Bindings: ENV }>({
+    windowMs: 1 * 60 * 1000, // 1 minutes
+    limit: 60, // Limit each IP to 60 requests per `window`
+    standardHeaders: "draft-6", // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+    keyGenerator: (c) => c.req.header("cf-connecting-ip") ?? "", // Method to generate custom identifiers for clients.
+    store: new WorkersKVStore({
+      namespace: c.env.FUFUFAFAPI_RATE_LIMITER,
+    }), // Here CACHE is your WorkersKV Binding.
+  })(c, next),
 );
 
 api.get("/", (c) => {
