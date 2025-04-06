@@ -2,6 +2,7 @@
   "name": "fufufafapi",
   "scripts": {
     "dev": "wrangler dev",
+    "dev:remote": "wrangler dev --remote",
     "deploy": "wrangler deploy --minify"
   },
   "dependencies": {

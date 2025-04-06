@@ -1,9 +1,18 @@
-import { Hono } from 'hono'
+import { Hono } from "hono";
+import { logger } from "hono/logger";
 
-const app = new Hono()
+import { api } from "~/routes/api";
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+import { ENV } from "~/lib/types";
 
-export default app
+const app = new Hono<{ Bindings: ENV }>();
+
+app.use(logger());
+
+app.get("/", (c) => {
+  return c.text("Hello Hono!");
+});
+
+app.route("/api", api);
+
+export default app;
