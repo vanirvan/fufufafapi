@@ -18,42 +18,49 @@ api.use(
   }),
 );
 
-api.get("/", async (c) => {
-  const db = c.env.FUFUFAFAPI_DB;
+api.get(
+  "/",
+  cache({
+    cacheName: "api-id-cache",
+    cacheControl: "max-age=86400", // 1 day cache
+  }),
+  async (c) => {
+    const db = c.env.FUFUFAFAPI_DB;
 
-  // get the ?content query param from the request
-  const contentParam = c.req.query("content");
+    // get the ?content query param from the request
+    const contentParam = c.req.query("content");
 
-  if (contentParam) {
-    // if ?content is present, search for the quote in the database
-    const content = contentParam ? decodeURIComponent(contentParam) : null;
-    const stmt = db.prepare("SELECT * FROM quotes WHERE content LIKE ?");
+    if (contentParam) {
+      // if ?content is present, search for the quote in the database
+      const content = contentParam ? decodeURIComponent(contentParam) : null;
+      const stmt = db.prepare("SELECT * FROM quotes WHERE content LIKE ?");
 
-    try {
-      const result = await stmt.bind(`%${content}%`).all();
-      if (!result.results || result.results.length === 0) {
-        return c.json({ error: "Quote not found" }, 404);
+      try {
+        const result = await stmt.bind(`%${content}%`).all();
+        if (!result.results || result.results.length === 0) {
+          return c.json({ error: "Quote not found" }, 404);
+        }
+        return c.json(result.results, 200);
+      } catch (e) {
+        console.log(e);
+        return c.json({ error: "Internal server error" }, 500);
       }
-      return c.json(result.results, 200);
+    }
+
+    // get all quotes from the database if no ?content is present
+    const stmt = db.prepare("SELECT * FROM quotes");
+    try {
+      const quotes = await stmt.all();
+      if (!quotes.results || quotes.results.length === 0) {
+        return c.json({ error: "No quotes found" }, 404);
+      }
+      return c.json(quotes.results, 200);
     } catch (e) {
       console.log(e);
       return c.json({ error: "Internal server error" }, 500);
     }
-  }
-
-  // get all quotes from the database if no ?content is present
-  const stmt = db.prepare("SELECT * FROM quotes");
-  try {
-    const quotes = await stmt.all();
-    if (!quotes.results || quotes.results.length === 0) {
-      return c.json({ error: "No quotes found" }, 404);
-    }
-    return c.json(quotes.results, 200);
-  } catch (e) {
-    console.log(e);
-    return c.json({ error: "Internal server error" }, 500);
-  }
-});
+  },
+);
 
 // random api endpoint will use this instead of /api/
 api.get("/random", (c) => {
