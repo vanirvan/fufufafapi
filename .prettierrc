@@ -18,6 +18,7 @@
     "^~/routes(.*)$",
     "^~/services(.*)$",
     "^~/lib(.*)$",
+    "^~/views(.*)$",
     "^[./]"
   ],
   "importOrderSeparation": true,

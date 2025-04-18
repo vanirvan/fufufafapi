@@ -3,12 +3,15 @@
   "scripts": {
     "dev": "wrangler dev",
     "dev:remote": "wrangler dev --remote",
-    "deploy": "wrangler deploy --minify"
+    "deploy": "wrangler deploy --minify",
+    "tailwind:watch": "npx @tailwindcss/cli -i ./src/views/assets/tailwind-base.css -o ./public/assets/index.css --watch"
   },
   "dependencies": {
     "@hono-rate-limiter/cloudflare": "^0.2.2",
+    "@tailwindcss/cli": "^4.1.4",
     "hono": "^4.7.5",
-    "hono-rate-limiter": "^0.4.2"
+    "hono-rate-limiter": "^0.4.2",
+    "tailwindcss": "^4.1.4"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250214.0",
