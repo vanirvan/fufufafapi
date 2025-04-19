@@ -64,7 +64,7 @@ api.get(
 
 // random api endpoint will use this instead of /api/
 api.get("/random", (c) => {
-  const MAX_QUOTE_ID = 699;
+  const MAX_QUOTE_ID = 1314;
   const randomQuoteId = Math.floor(Math.random() * MAX_QUOTE_ID) + 1;
 
   return c.redirect(`/api/${randomQuoteId}`, 302);

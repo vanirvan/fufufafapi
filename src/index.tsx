@@ -5,6 +5,7 @@ import { logger } from "hono/logger";
 import { trimTrailingSlash } from "hono/trailing-slash";
 
 import { api } from "~/routes/api";
+import { update } from "~/routes/update";
 
 import { ENV } from "~/lib/types";
 
@@ -35,5 +36,6 @@ app.get(
 );
 
 app.route("/api", api);
+app.route("/update", update);
 
 export default app;
